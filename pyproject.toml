@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "persprot"
-version = "0.1.0"
+version = "1.1.0"
 description = "A lightweight Python package to assess and correct perspective rotation in Milky Way satellite galaxies."
 readme = "README.md"
 license = { text = "MIT" }
@@ -31,6 +31,6 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/YourUsername/persprot"
-"Bug Tracker" = "https://github.com/YourUsername/persprot/issues"
+"Homepage" = "https://github.com/ahicks778/persprot"
+"Bug Tracker" = "https://github.com/ahicks778/persprot/issues"
 "Paper" = "https://arxiv.org/"  # Add arXiv link when available
