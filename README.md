@@ -44,7 +44,7 @@ pcorr(RA, DEC, v_los, e_v_los=None, RA0=None, DEC0=None, system_name=None,
 * **`RA0`**, **`DEC0`** (*astropy.units.Quantity, optional*): System center coordinates. Automatically fetched from LVDB if omitted.
 * **`system_name`** (*str, optional*): Target system name for automatic LVDB query.
 * **`pmra`**, **`pmdec`**, **`D`** (*astropy.units.Quantity, optional*): Systemic proper motions and distance.
-* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Systemic parameter uncertainties.
+* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*):  Uncertainties associated with proper motions and distance (supports symmetric or asymmetric `[lower, upper]` inputs).
 * **`verbose`** (*bool, optional*): If `True`, prints confirmation output. Defaults to `True`.
 
 #### Returns
@@ -68,7 +68,7 @@ pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmdec=No
 * **`system_name`** (*str, optional*): Target name to query system center, proper motion, and distance from LVDB.
 * **`pmra`**, **`pmdec`** (*astropy.units.Quantity, optional*): Proper motion vector components (e.g., `u.mas/u.yr`).
 * **`D`** (*astropy.units.Quantity, optional*): Distance (e.g., `u.kpc`).
-* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Uncertainties for systemic parameters.
+* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*):  Uncertainties associated with proper motions and distance (supports symmetric or asymmetric `[lower, upper]` inputs).
 * **`verbose`** (*bool, optional*): If `True`, prints calculation details to the console. Defaults to `True`.
 
 #### Returns
