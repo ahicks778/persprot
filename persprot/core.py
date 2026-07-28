@@ -61,9 +61,7 @@ def pgrad(system_name=None, pmra=None, pmdec=None, rh=None, D=None,
 
     sources = {"pmra": "User Input", "pmdec": "User Input", "rh": "User Input", "D": "User Input"}
     
-    # -----------------------------------------------------------------
-    # 1. DATABASE LOOKUP
-    # -----------------------------------------------------------------
+    ## Database Lookup
     if any(param is None for param in (pmra, pmdec, rh, D)):
         lvdb = _get_lvdb()
         match_idx = np.where(lvdb['key_lower'] == system_name.strip().lower())[0]
@@ -96,18 +94,13 @@ def pgrad(system_name=None, pmra=None, pmdec=None, rh=None, D=None,
             e_D = _safe_db_err(row['distance_em'], row['distance_ep'], u.kpc)
             sources["D"] = "LVDB"
 
-    # -----------------------------------------------------------------
-    # 2. VALIDATIONS
-    # -----------------------------------------------------------------
     pmra = _ensure_quantity(pmra, ['angular speed'], 'pmra').to(u.mas/u.yr)
     pmdec = _ensure_quantity(pmdec, ['angular speed'], 'pmdec').to(u.mas/u.yr)
     rh = _ensure_quantity(rh, ['length', 'angle'], 'rh')
     D = _ensure_quantity(D, ['length'], 'D').to(u.kpc)
     b_line = rh if scale_unit == 'rh' else _ensure_quantity(scale_unit, ['length', 'angle'], 'scale_unit')
 
-    # -----------------------------------------------------------------
-    # 3. CALCULATIONS
-    # -----------------------------------------------------------------
+    ## Perspective Gradient Calculation (Equation 11)
     b_is_length = (b_line.unit.physical_type == 'length')
     pmt = np.hypot(pmra, pmdec)
     raw_result = (b_line * pmt) if b_is_length else (b_line * D * pmt)
@@ -150,9 +143,7 @@ def pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmde
                  e_pmra=None, e_pmdec=None, e_D=None, verbose=True):
     """Calculates perspective rotation bias (delta_p) and error for specific stars."""
     
-    # -----------------------------------------------------------------
-    # 1. DATABASE LOOKUP
-    # -----------------------------------------------------------------
+    ##Database Lookup 
     if system_name is not None and any(p is None for p in (RA0, DEC0, pmra, pmdec, D)):
         lvdb = _get_lvdb()
         idx = np.where(lvdb['key_lower'] == system_name.strip().lower())[0]
@@ -168,9 +159,6 @@ def pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmde
         e_pmdec = _safe_db_err(row['pmdec_em'], row['pmdec_ep'], u.mas/u.yr) if e_pmdec is None else e_pmdec
         e_D = _safe_db_err(row['distance_em'], row['distance_ep'], u.kpc) if e_D is None else e_D
 
-    # -----------------------------------------------------------------
-    # 2. STANDARDIZATION
-    # -----------------------------------------------------------------
     RA = _ensure_quantity(RA, ['angle'], 'RA').to(u.deg)
     DEC = _ensure_quantity(DEC, ['angle'], 'DEC').to(u.deg)
     RA0 = _ensure_quantity(RA0, ['angle'], 'RA0').to(u.deg)
@@ -179,12 +167,7 @@ def pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmde
     pmdec = _ensure_quantity(pmdec, ['angular speed'], 'pmdec').to(u.mas/u.yr)
     D = _ensure_quantity(D, ['length'], 'D').to(u.kpc)
 
-    # -----------------------------------------------------------------
-    # 3. BIAS CALCULATION (Equations 8 & 9)
-    # -----------------------------------------------------------------
-    # This calculation exactly replicates Equations 8 & 9 from Hicks & Geha (2026),
-    # but utilizes astropy's native unit conversions for exact numerical precision.
-    
+    ## BIAS CALCULATION (Equations 8 & 9) 
     delta_alpha = RA - RA0
     delta_delta = DEC - DEC0
     delta_alpha_star = delta_alpha * np.cos(DEC0.to(u.rad)) 
