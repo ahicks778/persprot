@@ -32,6 +32,8 @@ pip install "git+[https://github.com/ahicks778/persprot.git](https://github.com/
 
 Applies perspective rotation corrections directly to measured line-of-sight velocities ($v_{\mathrm{los}}$). This is the primary function for reducing kinematic datasets.
 
+> **Important:** You must specify **either** a `system_name` (to automatically fetch parameters from the LVDB) **or** provide the manual systemic parameters (`RA0`, `DEC0`, `pmra`, `pmdec`, `D`).
+
 ```python
 pcorr(RA, DEC, v_los, e_v_los=None, RA0=None, DEC0=None, system_name=None,
       pmra=None, pmdec=None, D=None, e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
@@ -57,6 +59,8 @@ pcorr(RA, DEC, v_los, e_v_los=None, RA0=None, DEC0=None, system_name=None,
 
 Computes the perspective rotation velocity bias ($\Delta p$) and associated uncertainty ($\sigma_{\Delta p}$) for target stars without modifying velocity arrays.
 
+> **Important:** You must specify **either** a `system_name` (to automatically fetch parameters from the LVDB) **or** provide the manual systemic parameters (`RA0`, `DEC0`, `pmra`, `pmdec`, `D`).
+
 ```python
 pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmdec=None, D=None, 
              e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
@@ -80,6 +84,8 @@ pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmdec=No
 ### `pgrad`
 
 Calculates the physical perspective gradient magnitude and Position Angle (PA) across a stellar system.
+
+> **Important:** You must specify **either** a `system_name` (to automatically fetch parameters from the LVDB) **or** provide the manual systemic parameters (`pmra`, `pmdec`, `rh`, `D`).
 
 ```python
 pgrad(system_name=None, pmra=None, pmdec=None, rh=None, D=None, 
