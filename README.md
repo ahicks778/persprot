@@ -16,15 +16,66 @@ You can install `persprot` directly via PyPI using `pip`:
 pip install persprot
 ```
 
-To install the most up-to-date development version directly from GitHub, run:
+To install the most up-to-date development version directly from GitHub:
 
 ```bash
-pip install git+[https://github.com/ahicks778/persprot.git](https://github.com/ahicks778/persprot.git)
+pip install "git+[https://github.com/ahicks778/persprot.git](https://github.com/ahicks778/persprot.git)"
 ```
+
+> **Note for macOS / zsh users:** Always wrap the git URL in double quotes as shown above to avoid shell syntax errors (`zsh: unknown file attribute`).
 
 ---
 
 ## API Reference & Core Functions
+
+### `pcorr`
+
+Applies perspective rotation corrections directly to measured line-of-sight velocities ($v_{\mathrm{los}}$). This is the primary function for reducing kinematic datasets.
+
+```python
+pcorr(RA, DEC, v_los, e_v_los=None, RA0=None, DEC0=None, system_name=None,
+      pmra=None, pmdec=None, D=None, e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
+```
+
+#### Parameters
+* **`RA`**, **`DEC`** (*astropy.units.Quantity*): Celestial coordinates of target stars.
+* **`v_los`** (*astropy.units.Quantity*): Measured line-of-sight velocities (e.g., `u.km/u.s`).
+* **`e_v_los`** (*astropy.units.Quantity, optional*): Velocity measurement uncertainties (e.g., `u.km/u.s`).
+* **`RA0`**, **`DEC0`** (*astropy.units.Quantity, optional*): System center coordinates. Automatically fetched from LVDB if omitted.
+* **`system_name`** (*str, optional*): Target system name for automatic LVDB query.
+* **`pmra`**, **`pmdec`**, **`D`** (*astropy.units.Quantity, optional*): Systemic proper motions and distance.
+* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Systemic parameter uncertainties.
+* **`verbose`** (*bool, optional*): If `True`, prints confirmation output. Defaults to `True`.
+
+#### Returns
+* **`v_pc`** (*astropy.units.Quantity*): Corrected line-of-sight velocities ($v_{\mathrm{los}} - \Delta p$) in `km/s`.
+* **`e_v_pc`** (*astropy.units.Quantity*): Total velocity uncertainties added in quadrature ($\sqrt{e_{v_{\mathrm{los}}}^2 + \sigma_{\Delta p}^2}$) in `km/s`.
+
+---
+
+### `pcorr_values`
+
+Computes the perspective rotation velocity bias ($\Delta p$) and associated uncertainty ($\sigma_{\Delta p}$) for target stars without modifying velocity arrays.
+
+```python
+pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmdec=None, D=None, 
+             e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
+```
+
+#### Parameters
+* **`RA`**, **`DEC`** (*astropy.units.Quantity*): Right Ascension and Declination of individual stars (e.g., `u.deg`).
+* **`RA0`**, **`DEC0`** (*astropy.units.Quantity, optional*): System center coordinates (e.g., `u.deg`). Automatically fetched from LVDB if omitted.
+* **`system_name`** (*str, optional*): Target name to query system center, proper motion, and distance from LVDB.
+* **`pmra`**, **`pmdec`** (*astropy.units.Quantity, optional*): Proper motion vector components (e.g., `u.mas/u.yr`).
+* **`D`** (*astropy.units.Quantity, optional*): Distance (e.g., `u.kpc`).
+* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Uncertainties for systemic parameters.
+* **`verbose`** (*bool, optional*): If `True`, prints calculation details to the console. Defaults to `True`.
+
+#### Returns
+* **`delta_p`** (*astropy.units.Quantity*): Perspective velocity correction array for each star in `km/s`.
+* **`sigma_dp`** (*astropy.units.Quantity*): Propagated uncertainty array for the velocity corrections in `km/s`.
+
+---
 
 ### `pgrad`
 
@@ -47,52 +98,3 @@ pgrad(system_name=None, pmra=None, pmdec=None, rh=None, D=None,
 #### Returns
 * **`gradient`** (*tuple*): `(val, e_val)` where `val` is the gradient magnitude in `km/s` and `e_val` is its uncertainty (or asymmetric uncertainties `(el_val, eu_val)`).
 * **`pa`** (*tuple*): `(pa_val, e_pa)` where `pa_val` is the position angle in degrees and `e_pa` is its uncertainty.
-
----
-
-### `pcorr_values`
-
-Computes the perspective rotation velocity bias ($\Delta p$) and associated uncertainty ($\sigma_{\Delta p}$) for target stars.
-
-```python
-pcorr_values(RA, DEC, RA0=None, DEC0=None, system_name=None, pmra=None, pmdec=None, D=None, 
-             e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
-```
-
-#### Parameters
-* **`RA`**, **`DEC`** (*astropy.units.Quantity*): Right Ascension and Declination of individual stars (e.g., `u.deg`).
-* **`RA0`**, **`DEC0`** (*astropy.units.Quantity, optional*): System center coordinates (e.g., `u.deg`). Automatically fetched from LVDB if omitted.
-* **`system_name`** (*str, optional*): Target name to query system center, proper motion, and distance from LVDB.
-* **`pmra`**, **`pmdec`** (*astropy.units.Quantity, optional*): Proper motion vector components (e.g., `u.mas/u.yr`).
-* **`D`** (*astropy.units.Quantity, optional*): Distance (e.g., `u.kpc`).
-* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Uncertainties for systemic parameters.
-* **`verbose`** (*bool, optional*): If `True`, prints calculation details to the console. Defaults to `True`.
-
-#### Returns
-* **`delta_p`** (*astropy.units.Quantity*): Perspective velocity correction array for each star in `km/s`.
-* **`sigma_dp`** (*astropy.units.Quantity*): Propagated uncertainty array for the velocity corrections in `km/s`.
-
----
-
-### `pcorr`
-
-Applies perspective rotation corrections directly to measured line-of-sight velocities ($v_{\mathrm{los}}$).
-
-```python
-pcorr(RA, DEC, v_los, e_v_los=None, RA0=None, DEC0=None, system_name=None,
-      pmra=None, pmdec=None, D=None, e_pmra=None, e_pmdec=None, e_D=None, verbose=True)
-```
-
-#### Parameters
-* **`RA`**, **`DEC`** (*astropy.units.Quantity*): Celestial coordinates of target stars.
-* **`v_los`** (*astropy.units.Quantity*): Measured line-of-sight velocities (e.g., `u.km/u.s`).
-* **`e_v_los`** (*astropy.units.Quantity, optional*): Velocity measurement uncertainties (e.g., `u.km/u.s`).
-* **`RA0`**, **`DEC0`** (*astropy.units.Quantity, optional*): System center coordinates.
-* **`system_name`** (*str, optional*): Target system name for automatic LVDB query.
-* **`pmra`**, **`pmdec`**, **`D`** (*astropy.units.Quantity, optional*): Systemic proper motions and distance.
-* **`e_pmra`**, **`e_pmdec`**, **`e_D`** (*Quantity, float, or list, optional*): Systemic parameter uncertainties.
-* **`verbose`** (*bool, optional*): If `True`, prints confirmation output. Defaults to `True`.
-
-#### Returns
-* **`v_pc`** (*astropy.units.Quantity*): Corrected line-of-sight velocities ($v_{\mathrm{los}} - \Delta p$) in `km/s`.
-* **`e_v_pc`** (*astropy.units.Quantity*): Total velocity uncertainties added in quadrature ($\sqrt{e_{v_{\mathrm{los}}}^2 + \sigma_{\Delta p}^2}$) in `km/s`.
